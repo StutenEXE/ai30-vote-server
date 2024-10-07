@@ -14,7 +14,7 @@ type VoteRequest struct {
 	AgentId  string `json:"agent-id"`
 	BallotId string `json:"ballot-id"`
 	Prefs    []int  `json:"prefs"`
-	Options  []int  `json:"options"` // facultatif exemple seuil d'acceptation
+	Options  []int  `json:"options"` // facultatif exemple seuil d'acceptation en approval
 }
 
 type ResultRequest struct {
