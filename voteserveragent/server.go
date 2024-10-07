@@ -1,38 +1,47 @@
 package voteserveragent
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
 	"time"
+
+	"https://github.com/StutenEXE/ai30-vote-server/td5"
 )
 
 type RestVoteServerAgent struct {
 	sync.Mutex
 	id   string
-	addr string
+	port string
 }
 
-func NewRestVoteServerAgent(addr string) *RestVoteServerAgent {
-	return &RestVoteServerAgent{id: addr, addr: addr}
+func NewRestVoteServerAgent(port string) *RestVoteServerAgent {
+	return &RestVoteServerAgent{id: port, port: port}
 }
 
 // Test de la méthode
-// func (rsa *RestServerAgent) checkMethod(method string, w http.ResponseWriter, r *http.Request) bool {
-// 	if r.Method != method {
-// 		w.WriteHeader(http.StatusMethodNotAllowed)
-// 		fmt.Fprintf(w, "method %q not allowed", r.Method)
-// 		return false
-// 	}
-// 	return true
-// }
+func (rvsa *RestVoteServerAgent) checkMethod(method string, w http.ResponseWriter, r *http.Request) bool {
+	if r.Method != method {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		fmt.Fprintf(w, "method %q not allowed", r.Method)
+		return false
+	}
+	return true
+}
 
-// func (*RestServerAgent) decodeRequest(r *http.Request) (req rad.Request, err error) {
-// 	buf := new(bytes.Buffer)
-// 	buf.ReadFrom(r.Body)
-// 	err = json.Unmarshal(buf.Bytes(), &req)
-// 	return
-// }
+func (*RestVoteServerAgent) decodeBallotRequest(r *http.Request) (req td5.BallotRequest, err error) {
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(r.Body)
+	err = json.Unmarshal(buf.Bytes(), &req)
+	return
+}
+
+fun(*RestVoteServerAgent) decodeVoteRequest(r *http.Request) (req td5.VoteRequest, err error){
+	
+}
 
 // func (rsa *RestServerAgent) doCalc(w http.ResponseWriter, r *http.Request) {
 // 	// mise à jour du nombre de requêtes
@@ -87,15 +96,45 @@ func NewRestVoteServerAgent(addr string) *RestVoteServerAgent {
 // 	w.Write(serial)
 // }
 
-func (rsa *RestVoteServerAgent) Start() {
+func (rvsa *RestVoteServerAgent) addBallot(w http.ResponseWriter, r *http.Request) {
+	if !rvsa.checkMethod("POST", w, r) {
+		return
+	}
+
+	req, err := rvsa.decodeBallotRequest(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, err.Error())
+		return
+	}
+
+	req
+
+}
+
+func (rvsa *RestVoteServerAgent) addVote(w http.ResponseWriter, r *http.Request) {
+	if !rvsa.checkMethod("POST", w, r) {
+		return
+	}
+	req, err := rvsa.decodeVoteRequest(r)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, err.Error())
+		return
+	}
+	req
+}
+
+func (rvsa *RestVoteServerAgent) Start() {
 	// création du multiplexer
 	mux := http.NewServeMux()
-	// mux.HandleFunc("/calculator", rsa.doCalc)
-	// mux.HandleFunc("/reqcount", rsa.doReqcount)
+	mux.HandleFunc("/new_ballot", rvsa.addBallot)
+	mux.HandleFunc("/vote", rvsa.addVote)
+	mux.HandleFunc("/result", rvsa.giveResult)
 
 	// création du serveur http
 	s := &http.Server{
-		Addr:           rsa.addr,
+		Addr:           rvsa.addr,
 		Handler:        mux,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
