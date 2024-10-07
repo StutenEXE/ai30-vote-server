@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"td5/cosmoc"
+	"td5/comsoc"
 )
 
 type MajorityBallot struct {
@@ -15,7 +15,7 @@ type MajorityBallot struct {
 	votedIds     []string
 	nbAlts       int
 	tieBreakRule []int
-	profile      cosmoc.Profile
+	profile      comsoc.Profile
 }
 
 func (b *MajorityBallot) GetId() string {
