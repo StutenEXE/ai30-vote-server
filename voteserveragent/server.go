@@ -25,7 +25,7 @@ func NewRestVoteServerAgent(port string) *RestVoteServerAgent {
 }
 
 // Test de la méthode
-func (rvsa *RestVoteServerAgent) checkMethod(method string, w http.ResponseWriter, r *http.Request) bool {
+func (*RestVoteServerAgent) checkMethod(method string, w http.ResponseWriter, r *http.Request) bool {
 	if r.Method != method {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		fmt.Fprintf(w, "method %q not allowed", r.Method)
@@ -48,6 +48,13 @@ func (*RestVoteServerAgent) decodeVoteRequest(r *http.Request) (req td5.VoteRequ
 	return
 }
 
+func (*RestVoteServerAgent) decodeResultRequest(r *http.Request) (req td5.ResultRequest, err error) {
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(r.Body)
+	err = json.Unmarshal(buf.Bytes(), &req)
+	return
+}
+
 func (rvsa *RestVoteServerAgent) addBallot(w http.ResponseWriter, r *http.Request) {
 	if !rvsa.checkMethod("POST", w, r) {
 		return
@@ -59,19 +66,21 @@ func (rvsa *RestVoteServerAgent) addBallot(w http.ResponseWriter, r *http.Reques
 		fmt.Fprint(w, err.Error())
 		return
 	}
-
+	// On verrouille l'accès aux ballots
+	rvsa.Lock()
+	defer rvsa.Unlock()
 	// création du ballot
-	var b *ballot.Ballot
+	var b ballot.Ballot
+	id := fmt.Sprintf("scrutin%d", len(rvsa.ballots)+1)
 	switch req.Rule {
 	case "majority":
-		b = ballot.MajorityBallot{
-			id:           fmt.FormatString("scrutin%d", len(rvsa.ballots)+1),
-			deadline:     req.Deadline,
-			voterIds:     req.VoterIds,
-			nbAlts:       req.NbAlts,
-			tieBreakRule: req.TieBreakRule,
-		}
-		var ballot *ballot.Ballot = &b
+		b = ballot.NewMajorityBallot(
+			id,
+			req.Deadline,
+			req.VoterIds,
+			req.NbAlts,
+			req.TieBreakRule,
+		)
 	case "borda":
 		// TODO
 	case "approval":
@@ -83,6 +92,7 @@ func (rvsa *RestVoteServerAgent) addBallot(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
+	rvsa.ballots = append(rvsa.ballots, b)
 }
 
 func (rvsa *RestVoteServerAgent) getBallotById(id string) ballot.Ballot {
@@ -92,7 +102,6 @@ func (rvsa *RestVoteServerAgent) getBallotById(id string) ballot.Ballot {
 		}
 	}
 	return nil
-
 }
 
 func (rvsa *RestVoteServerAgent) addVote(w http.ResponseWriter, r *http.Request) {
@@ -106,10 +115,31 @@ func (rvsa *RestVoteServerAgent) addVote(w http.ResponseWriter, r *http.Request)
 		fmt.Fprint(w, err.Error())
 		return
 	}
+	// On verrouille l'accès aux ballots
+	rvsa.Lock()
+	defer rvsa.Unlock()
 	bal := rvsa.getBallotById(req.BallotId)
 	if bal == nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "Pas de ballot avec l'id %v", req.BallotId)
+		fmt.Fprintf(w, "Pas de ballot avec l'id %v", req.BallotId)
+		return
+	}
+	// Deadline dépassée
+	if bal.GetDeadline().Before(time.Now()) {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "la deadline est dépassée")
+		return
+	}
+	// A déjà voté
+	if bal.HasAlreadyVoted(req.AgentId) {
+		w.WriteHeader(http.StatusForbidden)
+		fmt.Fprintf(w, "vote déjà effectué")
+		return
+	}
+	// Pas le droit de vote
+	if !bal.IsAllowedToVote(req.AgentId) {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "pas autorisé à voter")
 		return
 	}
 
@@ -137,9 +167,34 @@ func (rvsa *RestVoteServerAgent) giveResult(w http.ResponseWriter, r *http.Reque
 	bal := rvsa.getBallotById(req.BallotId)
 	if bal == nil {
 		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, "Pas de bollot avec l'id %v", req.BallotId)
+		fmt.Fprintf(w, "Pas de ballot avec l'id %v", req.BallotId)
+		return
 	}
-	return
+	// Deadline pas encore passée
+	// if bal.GetDeadline().After(time.Now()) {
+	// 	w.WriteHeader(http.StatusTooEarly)
+	// 	fmt.Fprintf(w, "la deadline n'est pas encore passée")
+	// 	return
+	// }
+
+	winner, err := bal.GetWinner()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, err.Error())
+		return
+	}
+
+	ranking, err := bal.GetRanking()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, err.Error())
+		return
+	}
+
+	resp := td5.ResultResponse{Winner: winner, Ranking: ranking}
+	w.WriteHeader(http.StatusOK)
+	serial, _ := json.Marshal(resp)
+	w.Write(serial)
 }
 
 func (rvsa *RestVoteServerAgent) Start() {
@@ -148,6 +203,11 @@ func (rvsa *RestVoteServerAgent) Start() {
 	mux.HandleFunc("/new_ballot", rvsa.addBallot)
 	mux.HandleFunc("/vote", rvsa.addVote)
 	mux.HandleFunc("/result", rvsa.giveResult)
+	mux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		serial, _ := json.Marshal(rvsa.ballots[0].GetId())
+		w.Write(serial)
+	})
 
 	// création du serveur http
 	s := &http.Server{

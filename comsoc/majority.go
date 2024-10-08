@@ -1,6 +1,13 @@
 package comsoc
 
+import "errors"
+
 func MajoritySWF(p Profile) (count Count, err error) {
+	if len(p) == 0 {
+		err = errors.New("empty profile")
+		return
+	}
+
 	var alts []Alternative
 	copy(alts, p[0])
 

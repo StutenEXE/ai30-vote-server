@@ -1,27 +1,30 @@
 package td5
 
-import "time"
+import (
+	"td5/comsoc"
+	"time"
+)
 
 type BallotRequest struct {
-	Rule         string    `json:"rule"`
-	Deadline     time.Time `json:"deadline"`
-	VoterIds     []string  `json:"voter-ids"`
-	NbAlts       int       `json:"nb-alts"`
-	TieBreakRule []int     `json:"tie-break"`
+	Rule         string               `json:"rule"`
+	Deadline     time.Time            `json:"deadline"`
+	VoterIds     []string             `json:"voter-ids"`
+	NbAlts       int                  `json:"#alts"`
+	TieBreakRule []comsoc.Alternative `json:"tie-break"`
 }
 
 type VoteRequest struct {
-	AgentId  string `json:"agent-id"`
-	BallotId string `json:"ballot-id"`
-	Prefs    []int  `json:"prefs"`
-	Options  []int  `json:"options"` // facultatif exemple seuil d'acceptation en approval
+	AgentId  string               `json:"agent-id"`
+	BallotId string               `json:"ballot-id"`
+	Prefs    []comsoc.Alternative `json:"prefs"`
+	Options  []int                `json:"options"` // facultatif exemple seuil d'acceptation en approval
 }
 
 type ResultRequest struct {
-	BallotId string `json:"scrutin12"`
+	BallotId string `json:"ballot-id"`
 }
 
 type ResultResponse struct {
-	Winner  int   `json:"winner"`
-	Ranking []int `json:"ranking"`
+	Winner  comsoc.Alternative   `json:"winner"`
+	Ranking []comsoc.Alternative `json:"ranking"`
 }
