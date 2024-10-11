@@ -72,6 +72,12 @@ func (rvsa *RestVoteServerAgent) addBallot(w http.ResponseWriter, r *http.Reques
 	// création du ballot
 	var b ballot.Ballot
 	id := fmt.Sprintf("scrutin%d", len(rvsa.ballots)+1)
+	if req.Deadline.IsZero() || req.VoterIds == nil || req.NbAlts == 0 || req.TieBreakRule == nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Erreur dans la requête, paramètre : rule Deadlin voter-ids #alts tie-break"))
+		return
+	}
+
 	switch req.Rule {
 	case "majority":
 		b = ballot.NewMajorityBallot(
@@ -82,7 +88,13 @@ func (rvsa *RestVoteServerAgent) addBallot(w http.ResponseWriter, r *http.Reques
 			req.TieBreakRule,
 		)
 	case "borda":
-		// TODO
+		b = ballot.NewBordaBallot(
+			id,
+			req.Deadline,
+			req.VoterIds,
+			req.NbAlts,
+			req.TieBreakRule,
+		)
 	case "approval":
 		// TODO
 	default:
@@ -93,6 +105,8 @@ func (rvsa *RestVoteServerAgent) addBallot(w http.ResponseWriter, r *http.Reques
 	}
 
 	rvsa.ballots = append(rvsa.ballots, b)
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte(id))
 }
 
 func (rvsa *RestVoteServerAgent) getBallotById(id string) ballot.Ballot {
@@ -139,7 +153,7 @@ func (rvsa *RestVoteServerAgent) addVote(w http.ResponseWriter, r *http.Request)
 	// Pas le droit de vote
 	if !bal.IsAllowedToVote(req.AgentId) {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "pas autorisé à voter")
+		fmt.Fprintf(w, "pas autorisé à voter ")
 		return
 	}
 
@@ -170,12 +184,12 @@ func (rvsa *RestVoteServerAgent) giveResult(w http.ResponseWriter, r *http.Reque
 		fmt.Fprintf(w, "Pas de ballot avec l'id %v", req.BallotId)
 		return
 	}
-	// Deadline pas encore passée
-	// if bal.GetDeadline().After(time.Now()) {
-	// 	w.WriteHeader(http.StatusTooEarly)
-	// 	fmt.Fprintf(w, "la deadline n'est pas encore passée")
-	// 	return
-	// }
+	//Deadline pas encore passée
+	if bal.GetDeadline().After(time.Now()) {
+		w.WriteHeader(http.StatusTooEarly)
+		fmt.Fprintf(w, "la deadline n'est pas encore passée")
+		return
+	}
 
 	winner, err := bal.GetWinner()
 	if err != nil {
@@ -190,11 +204,17 @@ func (rvsa *RestVoteServerAgent) giveResult(w http.ResponseWriter, r *http.Reque
 		fmt.Fprint(w, err.Error())
 		return
 	}
-
-	resp := td5.ResultResponse{Winner: winner, Ranking: ranking}
-	w.WriteHeader(http.StatusOK)
-	serial, _ := json.Marshal(resp)
-	w.Write(serial)
+	if len(ranking) > 1 {
+		resp := td5.ResultResponse{Winner: winner}
+		w.WriteHeader(http.StatusOK)
+		serial, _ := json.Marshal(resp)
+		w.Write(serial)
+	} else {
+		resp := td5.ResultResponse{Winner: winner, Ranking: ranking}
+		w.WriteHeader(http.StatusOK)
+		serial, _ := json.Marshal(resp)
+		w.Write(serial)
+	}
 }
 
 func (rvsa *RestVoteServerAgent) Start() {

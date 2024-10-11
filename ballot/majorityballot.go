@@ -14,7 +14,7 @@ type MajorityBallot struct {
 	voterIds    []string
 	votedIds    []string
 	nbAlts      int
-	majoritySwf func(comsoc.Profile) (count comsoc.Count, err error)
+	majoritySwf func(comsoc.Profile) (alts []comsoc.Alternative, err error)
 	majorityScf func(comsoc.Profile) (comsoc.Alternative, error)
 	profile     comsoc.Profile
 }
@@ -31,7 +31,7 @@ func NewMajorityBallot(
 		deadline:    deadline,
 		voterIds:    voterIds,
 		nbAlts:      nbAlts,
-		majoritySwf: comsoc.MajoritySWF,
+		majoritySwf: comsoc.SWFFactory(comsoc.MajoritySWF, comsoc.TieBreakFactory(tieBreakRule)),
 		majorityScf: comsoc.SCFFactory(comsoc.MajoritySCF, comsoc.TieBreakFactory(tieBreakRule)),
 	}
 }
@@ -49,18 +49,14 @@ func (b *MajorityBallot) GetWinner() (comsoc.Alternative, error) {
 }
 
 func (b *MajorityBallot) GetRanking() ([]comsoc.Alternative, error) {
-	c, err := b.majoritySwf(b.profile)
-	if err != nil {
-		return nil, err
-	}
-	fmt.Printf("Count : %v", c)
-	return getRankingFromCount(c), nil
+	return b.majoritySwf(b.profile)
 }
 
 func (b *MajorityBallot) AddVote(agentId string, vote []comsoc.Alternative, _ []int) (int, error) {
 	// Vote invalide - pas le bon nombre d'alternatives
-	if len(vote) != b.nbAlts {
-		return http.StatusBadRequest, fmt.Errorf("vote invalide")
+	err := CheckAlternativesUnicity(vote)
+	if len(vote) != b.nbAlts || err != nil {
+		return http.StatusBadRequest, fmt.Errorf("vote invalide ")
 	}
 
 	// Ajout du vote

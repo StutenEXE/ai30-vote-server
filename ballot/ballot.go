@@ -1,6 +1,7 @@
 package ballot
 
 import (
+	"fmt"
 	"sort"
 	"td5/comsoc"
 	"time"
@@ -28,4 +29,16 @@ func getRankingFromCount(c comsoc.Count) []comsoc.Alternative {
 	})
 
 	return alts
+}
+
+func CheckAlternativesUnicity(alts []comsoc.Alternative) error {
+	altCounts := make(map[comsoc.Alternative]int)
+	for _, alt := range alts {
+		if altCounts[alt] == 1 || int(alt) > len(alts) || alt < 1 {
+			return fmt.Errorf("the alternative %v made an error", alt)
+		}
+		altCounts[alt] = 1
+	}
+
+	return nil
 }
