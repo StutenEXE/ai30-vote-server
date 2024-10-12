@@ -1,6 +1,8 @@
 package comsoc
 
-import "errors"
+import (
+	"errors"
+)
 
 func MajoritySWF(p Profile) (count Count, err error) {
 	if len(p) == 0 {

@@ -19,7 +19,7 @@ func TestWrongBallotParameters(t *testing.T) {
 		TieBreakRule: []comsoc.Alternative{},
 	}
 
-	//1 Rule inconnu
+	// 1 Rule inconnu
 	status, ballotID, _ := agent.Ballot(ballotReq)
 	if ballotID.ID != "" || status != "501 Not Implemented" {
 		t.Error(status)
@@ -32,7 +32,7 @@ func TestWrongBallotParameters(t *testing.T) {
 		TieBreakRule: []comsoc.Alternative{},
 	}
 
-	//Pas assez d'arg
+	// Pas assez d'arg (deadline)
 	status, ballotID, _ = agent.Ballot(ballotReq)
 	if ballotID.ID != "" || status != "400 Bad Request" {
 		t.Error(status)
@@ -45,7 +45,7 @@ func TestWrongBallotParameters(t *testing.T) {
 		TieBreakRule: []comsoc.Alternative{},
 	}
 
-	//Pas assez d'arg
+	//Pas assez d'arg (voterIds)
 	status, ballotID, _ = agent.Ballot(ballotReq)
 	if ballotID.ID != "" || status != "400 Bad Request" {
 		t.Error(status)
@@ -58,7 +58,7 @@ func TestWrongBallotParameters(t *testing.T) {
 		TieBreakRule: []comsoc.Alternative{},
 	}
 
-	//Pas assez d'arg
+	// Pas assez d'arg (nbAlts)
 	status, ballotID, _ = agent.Ballot(ballotReq)
 	if ballotID.ID != "" || status != "400 Bad Request" {
 		t.Error(status)
@@ -71,7 +71,7 @@ func TestWrongBallotParameters(t *testing.T) {
 		NbAlts:   3,
 	}
 
-	//Pas assez d'arg
+	// Pas assez d'arg (TieBreakRule)
 	status, ballotID, _ = agent.Ballot(ballotReq)
 	if ballotID.ID != "" || status != "400 Bad Request" {
 		t.Error(status)
@@ -84,8 +84,8 @@ func TestWrongBallotParameters(t *testing.T) {
 		NbAlts:       3,
 		TieBreakRule: []comsoc.Alternative{},
 	}
-	//Bonne requete
 
+	// Bonne requete
 	status, ballotID, _ = agent.Ballot(ballotReq)
 	if ballotID.ID == "" || status != "201 Created" {
 		t.Error(status)

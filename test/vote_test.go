@@ -16,13 +16,13 @@ func TestVoteWrongParameter(t *testing.T) {
 		Prefs:    []comsoc.Alternative{1, 2},
 	}
 
-	//PAS de bon ballot id
+	// Pas de bon ballot id
 	status, _ := agent.Vote(voteReq)
 	if status != "400 Bad Request" {
 		t.Error(status)
 	}
 
-	//on crée le ballot avant du coup
+	// On crée le ballot avant du coup
 	ballotReq := td5.BallotRequest{
 		Rule:         "majority",
 		Deadline:     time.Now().Add(2 * time.Second),
@@ -35,7 +35,7 @@ func TestVoteWrongParameter(t *testing.T) {
 		t.Error(status)
 	}
 
-	//ON vérifie le ballot avec une bonne requête
+	// On vérifie le ballot avec une bonne requête
 	voteReq = td5.VoteRequest{
 		AgentId:  "agent1",
 		BallotId: bID.ID,
@@ -46,19 +46,19 @@ func TestVoteWrongParameter(t *testing.T) {
 		t.Error(status)
 	}
 
-	//A déjà voté
+	// A déjà voté
 	status, _ = agent.Vote(voteReq)
 	if status != "403 Forbidden" {
 		t.Error(status)
 	}
 
-	//agent inconnu
+	// Agent inconnu
 	voteReq = td5.VoteRequest{
 		AgentId:  "Clement",
 		BallotId: bID.ID,
 		Prefs:    []comsoc.Alternative{1, 2},
 	}
-	//A déjà voté
+	// A déjà voté
 	status, _ = agent.Vote(voteReq)
 	if status != "400 Bad Request" {
 		t.Error(status)
@@ -69,7 +69,7 @@ func TestVoteWrongParameter(t *testing.T) {
 		BallotId: bID.ID,
 		Prefs:    []comsoc.Alternative{4, 2},
 	}
-	//Mauvais vote
+	// Mauvais vote
 	status, _ = agent.Vote(voteReq)
 	if status != "400 Bad Request" {
 		t.Error(status)
@@ -81,7 +81,7 @@ func TestVoteWrongParameter(t *testing.T) {
 		Prefs:    []comsoc.Alternative{1, 2},
 	}
 	time.Sleep(time.Second * 2)
-	//deadline
+	// Deadline
 	status, _ = agent.Vote(voteReq)
 	if status != "503 Service Unavailable" {
 		t.Error(status)
@@ -90,7 +90,7 @@ func TestVoteWrongParameter(t *testing.T) {
 }
 
 func TestVoteApprovalWrongOptions(t *testing.T) {
-	//on crée le ballot avant du coup
+	// On crée le ballot
 	ballotReq := td5.BallotRequest{
 		Rule:         "approval",
 		Deadline:     time.Now().Add(2 * time.Second),
@@ -103,7 +103,7 @@ func TestVoteApprovalWrongOptions(t *testing.T) {
 		t.Error(status)
 	}
 
-	//ON vérifie le ballot avec une bonne requête
+	// On vérifie le ballot avec une bonne requête
 	voteReq := td5.VoteRequest{
 		AgentId:  "agent1",
 		BallotId: bID.ID,
@@ -115,7 +115,7 @@ func TestVoteApprovalWrongOptions(t *testing.T) {
 		t.Error(status)
 	}
 
-	//Pas d'options
+	// Pas d'options
 	voteReq = td5.VoteRequest{
 		AgentId:  "agent2",
 		BallotId: bID.ID,
@@ -126,7 +126,7 @@ func TestVoteApprovalWrongOptions(t *testing.T) {
 		t.Error(status)
 	}
 
-	//Options pas bonne
+	// Options pas bonne
 	voteReq = td5.VoteRequest{
 		AgentId:  "agent2",
 		BallotId: bID.ID,

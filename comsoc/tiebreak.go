@@ -27,11 +27,11 @@ func SWFFactory(swf func(p Profile) (Count, error), tb func([]Alternative) (Alte
 		for elem := range c {
 			alts = append(alts, elem)
 		}
+		alts = maxCount(c)
 		sort.Slice(alts, func(i, j int) bool {
-			return c[alts[i]] >= c[alts[j]]
+			winner, _ := tb([]Alternative{alts[i], alts[j]})
+			return alts[i] == winner
 		})
-		alt, err := tb(alts)
-		alts = []Alternative{alt}
 		return
 	}
 }

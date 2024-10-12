@@ -103,6 +103,14 @@ func (rvsa *RestVoteServerAgent) addBallot(w http.ResponseWriter, r *http.Reques
 			req.NbAlts,
 			req.TieBreakRule,
 		)
+	case "copeland":
+		b = ballot.NewCopelandBallot(
+			id,
+			req.Deadline,
+			req.VoterIds,
+			req.NbAlts,
+			req.TieBreakRule,
+		)
 	default:
 		w.WriteHeader(http.StatusNotImplemented)
 		msg := fmt.Sprintf("Unknown rule '%s'", req.Rule)
@@ -191,7 +199,7 @@ func (rvsa *RestVoteServerAgent) giveResult(w http.ResponseWriter, r *http.Reque
 	bal := rvsa.getBallotById(req.BallotId)
 	if bal == nil {
 		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprintf(w, "Pas de ballot avec l'id %v", req.BallotId)
+		fmt.Fprintf(w, "pas de ballot avec l'id %v", req.BallotId)
 		return
 	}
 	//Deadline pas encore passée
@@ -214,17 +222,16 @@ func (rvsa *RestVoteServerAgent) giveResult(w http.ResponseWriter, r *http.Reque
 		fmt.Fprint(w, err.Error())
 		return
 	}
-	if len(ranking) > 1 {
-		resp := td5.ResultResponse{Winner: winner}
-		w.WriteHeader(http.StatusOK)
-		serial, _ := json.Marshal(resp)
-		w.Write(serial)
-	} else {
-		resp := td5.ResultResponse{Winner: winner, Ranking: ranking}
-		w.WriteHeader(http.StatusOK)
-		serial, _ := json.Marshal(resp)
-		w.Write(serial)
+
+	resp := td5.ResultResponse{Winner: winner, Ranking: ranking}
+	w.WriteHeader(http.StatusOK)
+	serial, err := json.Marshal(resp)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprint(w, err.Error())
+		return
 	}
+	w.Write(serial)
 }
 
 func (rvsa *RestVoteServerAgent) Start() {
@@ -233,11 +240,6 @@ func (rvsa *RestVoteServerAgent) Start() {
 	mux.HandleFunc("/new_ballot", rvsa.addBallot)
 	mux.HandleFunc("/vote", rvsa.addVote)
 	mux.HandleFunc("/result", rvsa.giveResult)
-	mux.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		serial, _ := json.Marshal(rvsa.ballots[0].GetId())
-		w.Write(serial)
-	})
 
 	// création du serveur http
 	s := &http.Server{
