@@ -11,17 +11,9 @@ import (
 
 var url string = "http://localhost:8080"
 
-type Agent struct {
-	id string
-}
-
-func NewAgent(id string) *Agent {
-	return &Agent{id: id}
-}
-
 // J'ai mis un interface pour tes les types
 // de requete afin de faire tous les post possible
-func (vca *Agent) makeRequest(endpoint string, method string, mesdata interface{}) (*http.Response, error) {
+func makeRequest(endpoint string, method string, mesdata interface{}) (*http.Response, error) {
 	url := fmt.Sprintf("%s/%s", url, endpoint)
 
 	data, err := json.Marshal(mesdata)
@@ -48,29 +40,30 @@ func (vca *Agent) makeRequest(endpoint string, method string, mesdata interface{
 	return res, err
 }
 
-func (vca *Agent) Ballot(req td5.BallotRequest) (string, string, error) {
+func Ballot(req td5.BallotRequest) (string, td5.BallotResponse, error) {
 	// Envoi de la requête de création de bulletin
-	resp, err := vca.makeRequest("new_ballot", "POST", req)
+	resp, err := makeRequest("new_ballot", "POST", req)
 	if err != nil {
-		return resp.Status, "", err
+		return resp.Status, td5.BallotResponse{}, err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusCreated {
-		return resp.Status, "", fmt.Errorf("failed to create ballot: %s", resp.Status)
+		return resp.Status, td5.BallotResponse{}, fmt.Errorf("failed to create ballot: %s", resp.Status)
 	}
 
-	var id string
+	var id td5.BallotResponse
+	fmt.Print(resp.Body)
 	err = json.NewDecoder(resp.Body).Decode(&id)
 	if err != nil {
-		return resp.Status, "", err
+		return resp.Status, td5.BallotResponse{}, err
 	}
 	return resp.Status, id, nil
 }
 
-func (vca *Agent) Vote(req td5.VoteRequest) (string, error) {
+func Vote(req td5.VoteRequest) (string, error) {
 	// Envoi de la requête de vote
-	resp, err := vca.makeRequest("vote", "POST", req)
+	resp, err := makeRequest("vote", "POST", req)
 	if err != nil {
 		return resp.Status, err
 	}
@@ -83,11 +76,11 @@ func (vca *Agent) Vote(req td5.VoteRequest) (string, error) {
 	return resp.Status, nil
 }
 
-func (vca *Agent) Result(req td5.ResultRequest) (string, td5.ResultResponse, error) {
+func Result(req td5.ResultRequest) (string, td5.ResultResponse, error) {
 	var result td5.ResultResponse
 
 	// Envoi de la requête pour obtenir le résultat
-	resp, err := vca.makeRequest("result", "POST", req)
+	resp, err := makeRequest("result", "POST", req)
 	if err != nil {
 		return resp.Status, result, err
 	}

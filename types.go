@@ -13,6 +13,10 @@ type BallotRequest struct {
 	TieBreakRule []comsoc.Alternative `json:"tie-break"`
 }
 
+type BallotResponse struct {
+	ID string `json:"ballod-id"`
+}
+
 type VoteRequest struct {
 	AgentId  string               `json:"agent-id"`
 	BallotId string               `json:"ballot-id"`

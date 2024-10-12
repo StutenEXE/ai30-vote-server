@@ -9,7 +9,6 @@ import (
 )
 
 func TestWrongBallotParameters(t *testing.T) {
-	client := agent.NewAgent("agent1")
 
 	// Création d'un ballot (peu importe vu que on teste les mauvais paramètre)
 	ballotReq := td5.BallotRequest{
@@ -21,8 +20,8 @@ func TestWrongBallotParameters(t *testing.T) {
 	}
 
 	//1 Rule inconnu
-	status, ballotID, _ := client.Ballot(ballotReq)
-	if ballotID != "" || status != "501 Not Implemented" {
+	status, ballotID, _ := agent.Ballot(ballotReq)
+	if ballotID.ID != "" || status != "501 Not Implemented" {
 		t.Error(status)
 	}
 
@@ -34,8 +33,8 @@ func TestWrongBallotParameters(t *testing.T) {
 	}
 
 	//Pas assez d'arg
-	status, ballotID, _ = client.Ballot(ballotReq)
-	if ballotID != "" || status != "400 Bad Request" {
+	status, ballotID, _ = agent.Ballot(ballotReq)
+	if ballotID.ID != "" || status != "400 Bad Request" {
 		t.Error(status)
 	}
 
@@ -47,8 +46,8 @@ func TestWrongBallotParameters(t *testing.T) {
 	}
 
 	//Pas assez d'arg
-	status, ballotID, _ = client.Ballot(ballotReq)
-	if ballotID != "" || status != "400 Bad Request" {
+	status, ballotID, _ = agent.Ballot(ballotReq)
+	if ballotID.ID != "" || status != "400 Bad Request" {
 		t.Error(status)
 	}
 
@@ -60,8 +59,8 @@ func TestWrongBallotParameters(t *testing.T) {
 	}
 
 	//Pas assez d'arg
-	status, ballotID, _ = client.Ballot(ballotReq)
-	if ballotID != "" || status != "400 Bad Request" {
+	status, ballotID, _ = agent.Ballot(ballotReq)
+	if ballotID.ID != "" || status != "400 Bad Request" {
 		t.Error(status)
 	}
 
@@ -73,8 +72,8 @@ func TestWrongBallotParameters(t *testing.T) {
 	}
 
 	//Pas assez d'arg
-	status, ballotID, _ = client.Ballot(ballotReq)
-	if ballotID != "" || status != "400 Bad Request" {
+	status, ballotID, _ = agent.Ballot(ballotReq)
+	if ballotID.ID != "" || status != "400 Bad Request" {
 		t.Error(status)
 	}
 
@@ -87,8 +86,8 @@ func TestWrongBallotParameters(t *testing.T) {
 	}
 	//Bonne requete
 
-	status, ballotID, _ = client.Ballot(ballotReq)
-	if ballotID != "" || status != "201 Created" {
+	status, ballotID, _ = agent.Ballot(ballotReq)
+	if ballotID.ID == "" || status != "201 Created" {
 		t.Error(status)
 	}
 }

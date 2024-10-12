@@ -96,7 +96,13 @@ func (rvsa *RestVoteServerAgent) addBallot(w http.ResponseWriter, r *http.Reques
 			req.TieBreakRule,
 		)
 	case "approval":
-		// TODO
+		b = ballot.NewApprovalBallot(
+			id,
+			req.Deadline,
+			req.VoterIds,
+			req.NbAlts,
+			req.TieBreakRule,
+		)
 	default:
 		w.WriteHeader(http.StatusNotImplemented)
 		msg := fmt.Sprintf("Unknown rule '%s'", req.Rule)
@@ -106,7 +112,11 @@ func (rvsa *RestVoteServerAgent) addBallot(w http.ResponseWriter, r *http.Reques
 
 	rvsa.ballots = append(rvsa.ballots, b)
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte(id))
+	response := td5.BallotResponse{
+		ID: id,
+	}
+	byt, err := json.Marshal(response)
+	w.Write(byt)
 }
 
 func (rvsa *RestVoteServerAgent) getBallotById(id string) ballot.Ballot {
@@ -140,7 +150,7 @@ func (rvsa *RestVoteServerAgent) addVote(w http.ResponseWriter, r *http.Request)
 	}
 	// Deadline dépassée
 	if bal.GetDeadline().Before(time.Now()) {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusServiceUnavailable)
 		fmt.Fprintf(w, "la deadline est dépassée")
 		return
 	}

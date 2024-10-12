@@ -67,7 +67,7 @@ func (b *ApprovalBallot) AddVote(agentId string, vote []comsoc.Alternative, opti
 		return http.StatusBadRequest, fmt.Errorf("vote invalide ")
 	}
 
-	if options == nil || len(options) > 1 {
+	if options == nil || len(options) > 1 || options[0] > len(vote) || options[0] < 0 {
 		return http.StatusBadRequest, fmt.Errorf("vote invalide")
 	}
 
