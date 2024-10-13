@@ -5,6 +5,7 @@ import (
 	"time"
 
 	td5 "github.com/StutenEXE/ai30-vote-server"
+	"github.com/StutenEXE/ai30-vote-server/agent"
 	"github.com/StutenEXE/ai30-vote-server/comsoc"
 	"github.com/StutenEXE/ai30-vote-server/voteserveragent"
 )
@@ -13,47 +14,57 @@ func main() {
 	// Lancement du serveur de vote
 	server := voteserveragent.NewRestVoteServerAgent(":8080")
 	go server.Start()
+	defer fmt.Scanln()
 
 	// Création d'un ballot de type majority
+
 	ballotReq := td5.BallotRequest{
 		Rule:         "majority",
 		Deadline:     time.Now().Add(10 * time.Second),
-		VoterIds:     []string{"td5", "td52"},
+		VoterIds:     []string{"Clément", "Alexandre"},
 		NbAlts:       2,
 		TieBreakRule: []comsoc.Alternative{1, 2},
 	}
 
 	//créée le ballot
-	ballotID, err := td5.Ballot(ballotReq)
+	_, ballotID, err := agent.Ballot(ballotReq)
+
 	if err != nil {
 		fmt.Println("Erreur lors de la création du ballot:", err)
 		return
 	}
-	fmt.Println("Ballot créé avec succès, ID:", ballotID)
 
 	// vote 1
+
 	voteReq1 := td5.VoteRequest{
-		td5Id:    "td5",
-		BallotId: ballotID,
+		AgentId:  "Clément",
+		BallotId: ballotID.ID,
 		Prefs:    []comsoc.Alternative{1, 2},
 	}
-	err = td5.Vote(voteReq1)
+
+	_, err = agent.Vote(voteReq1)
+
 	if err != nil {
 		fmt.Println("Erreur lors du vote de l'agent1 1:", err)
 	} else {
+
 		fmt.Println("Vote de l'agent1 1 enregistré avec succès.")
 	}
 
 	//vote 2
+
 	voteReq2 := td5.VoteRequest{
-		td5Id:    "td52",
-		BallotId: ballotID,
+		AgentId:  "Alexandre",
+		BallotId: ballotID.ID,
 		Prefs:    []comsoc.Alternative{2, 1},
 	}
-	err = td5.Vote(voteReq2)
+
+	_, err = agent.Vote(voteReq2)
+
 	if err != nil {
 		fmt.Println("Erreur lors du vote de l'agent2 2:", err)
 	} else {
+
 		fmt.Println("Vote de l'agent2 enregistré avec succès.")
 	}
 
@@ -61,14 +72,16 @@ func main() {
 	time.Sleep(10 * time.Second)
 
 	//  demande le résultat
+
 	resultReq := td5.ResultRequest{
-		BallotId: ballotID,
+		BallotId: ballotID.ID,
 	}
-	result, err := td5.Result(resultReq)
+
+	_, result, err := agent.Result(resultReq)
+
 	if err != nil {
 		fmt.Println("Erreur lors de la récupération des résultats:", err)
 	} else {
 		fmt.Printf("Résultat du scrutin: Gagnant - %v, Classement - %v\n", result.Winner, result.Ranking)
 	}
-	fmt.Scanln()
 }

@@ -54,7 +54,6 @@ func Ballot(req td5.BallotRequest) (string, td5.BallotResponse, error) {
 	}
 
 	var id td5.BallotResponse
-	fmt.Print(resp.Body)
 	err = json.NewDecoder(resp.Body).Decode(&id)
 	if err != nil {
 		return resp.Status, td5.BallotResponse{}, err
