@@ -14,6 +14,8 @@ Le serveur devrait être lancé et écouter sur le **port 8080**
 
 ## Fonctionnalités Implémentées
 
+Les trois endpoints demandés (`/new_ballot`, `/vote`, `/result`) ont été implémentés avec leurs données et erreurs respectives
+
 ### Types de Scrutin
 
 *    majority
@@ -37,7 +39,7 @@ Le serveur devrait être lancé et écouter sur le **port 8080**
 
 *    Deadline non dépassée
 *    Scrutin inconnu
-*    Gagnant et classement des égalités en fonction du tie-break (notre interprétation de ranking)
+*    Gagnant (winner) et classement des égalités en fonction du tie-break (ranking) (notre interprétation des consignes)
 
 ### Agent
 
@@ -74,5 +76,4 @@ td5/
 ├─ voteclientagent/
 │  ├─ client.go
 ├─ types.go      **(utilisés partout dans le code)**
-
 ```
