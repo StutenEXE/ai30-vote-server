@@ -1,10 +1,19 @@
-## Installation Guide
+## Guide d'installation
 
 ```go install github.com/StutenEXE/ai30-vote-server/cmd@latest```
 
-Aller voir dans son répertoire ``go/bin/`` et lancer le ``cmd`` 
+Installation du projet dans le répertoire ``go/pkg/mod/github.com/'!stuten!e!x!e'`` 
+
+## Lancement du serveur
+
+Dans le répertoire racine du projet executer la commande suivante :
+
+`go run cmd/launch-server.go`
+
+Le serveur devrait être lancé et écouter sur le **port 8080**
 
 ## Fonctionnalités Implémentées
+
 ### Types de Scrutin
 
 *    majority
@@ -28,7 +37,7 @@ Aller voir dans son répertoire ``go/bin/`` et lancer le ``cmd``
 
 *    Deadline non dépassée
 *    Scrutin inconnu
-*    Gagnant et éventuellement un classement
+*    Gagnant et classement des égalités en fonction du tie-break (notre interprétation de ranking)
 
 ### Agent
 
@@ -36,7 +45,34 @@ Aller voir dans son répertoire ``go/bin/`` et lancer le ``cmd``
 *    Tests sur les scrutins, les votes et les résultats
 
 ## Test
+
 * Test de création et d'erreur de création de (ballot, vote, et resultat)
 * Test sur les résultats d'un vote
+* Pour les exectuer : `go test ./test` dans le repertoire racine du projet
 
 #### Voir dans `` /test ``
+
+## Architecture 
+
+```md
+td5/
+├─ ballot/        (généralisation des  votes au travers d'une interface)
+│  ├─ approvalballot.go
+│  ├─ ballot.go   (interface)
+│  ├─ bordaballot.go
+│  ├─ copelandballot.go
+│  ├─ majorityballot.go
+├─ cmd/           (codes de lancement de l'application)
+│  ├─ launch-server.go
+├─ comsoc/        (logiques de vote, provient du td4)
+├─ test/
+│  ├─ ballot_test.go
+│  ├─ result_test.go/
+│  ├─ vote_test.go
+├─ voteserveragent/
+│  ├─ server.go
+├─ voteclientagent/
+│  ├─ client.go
+├─ types.go       (utilisés partout dans le code)
+
+```
