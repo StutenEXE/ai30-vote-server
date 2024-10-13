@@ -6,8 +6,8 @@ import (
 
 	td5 "github.com/StutenEXE/ai30-vote-server"
 
-	"github.com/StutenEXE/ai30-vote-server/agent"
 	"github.com/StutenEXE/ai30-vote-server/comsoc"
+	"github.com/StutenEXE/ai30-vote-server/voteclientagent"
 )
 
 func TestWrongBallotParameters(t *testing.T) {
@@ -22,7 +22,7 @@ func TestWrongBallotParameters(t *testing.T) {
 	}
 
 	// 1 Rule inconnu
-	status, ballotID, _ := agent.Ballot(ballotReq)
+	status, ballotID, _ := voteclientagent.Ballot(ballotReq)
 	if ballotID.ID != "" || status != "501 Not Implemented" {
 		t.Error(status)
 	}
@@ -35,7 +35,7 @@ func TestWrongBallotParameters(t *testing.T) {
 	}
 
 	// Pas assez d'arg (deadline)
-	status, ballotID, _ = agent.Ballot(ballotReq)
+	status, ballotID, _ = voteclientagent.Ballot(ballotReq)
 	if ballotID.ID != "" || status != "400 Bad Request" {
 		t.Error(status)
 	}
@@ -48,7 +48,7 @@ func TestWrongBallotParameters(t *testing.T) {
 	}
 
 	//Pas assez d'arg (voterIds)
-	status, ballotID, _ = agent.Ballot(ballotReq)
+	status, ballotID, _ = voteclientagent.Ballot(ballotReq)
 	if ballotID.ID != "" || status != "400 Bad Request" {
 		t.Error(status)
 	}
@@ -61,7 +61,7 @@ func TestWrongBallotParameters(t *testing.T) {
 	}
 
 	// Pas assez d'arg (nbAlts)
-	status, ballotID, _ = agent.Ballot(ballotReq)
+	status, ballotID, _ = voteclientagent.Ballot(ballotReq)
 	if ballotID.ID != "" || status != "400 Bad Request" {
 		t.Error(status)
 	}
@@ -74,7 +74,7 @@ func TestWrongBallotParameters(t *testing.T) {
 	}
 
 	// Pas assez d'arg (TieBreakRule)
-	status, ballotID, _ = agent.Ballot(ballotReq)
+	status, ballotID, _ = voteclientagent.Ballot(ballotReq)
 	if ballotID.ID != "" || status != "400 Bad Request" {
 		t.Error(status)
 	}
@@ -88,7 +88,7 @@ func TestWrongBallotParameters(t *testing.T) {
 	}
 
 	// Bonne requete
-	status, ballotID, _ = agent.Ballot(ballotReq)
+	status, ballotID, _ = voteclientagent.Ballot(ballotReq)
 	if ballotID.ID == "" || status != "201 Created" {
 		t.Error(status)
 	}

@@ -5,8 +5,8 @@ import (
 	"time"
 
 	td5 "github.com/StutenEXE/ai30-vote-server"
-	"github.com/StutenEXE/ai30-vote-server/agent"
 	"github.com/StutenEXE/ai30-vote-server/comsoc"
+	"github.com/StutenEXE/ai30-vote-server/voteclientagent"
 )
 
 func TestVoteWrongParameter(t *testing.T) {
@@ -18,7 +18,7 @@ func TestVoteWrongParameter(t *testing.T) {
 	}
 
 	// Pas de bon ballot id
-	status, _ := agent.Vote(voteReq)
+	status, _ := voteclientagent.Vote(voteReq)
 	if status != "400 Bad Request" {
 		t.Error(status)
 	}
@@ -31,7 +31,7 @@ func TestVoteWrongParameter(t *testing.T) {
 		NbAlts:       2,
 		TieBreakRule: []comsoc.Alternative{1, 2},
 	}
-	status, bID, _ := agent.Ballot(ballotReq)
+	status, bID, _ := voteclientagent.Ballot(ballotReq)
 	if bID.ID == "" || status != "201 Created" {
 		t.Error(status)
 	}
@@ -42,13 +42,13 @@ func TestVoteWrongParameter(t *testing.T) {
 		BallotId: bID.ID,
 		Prefs:    []comsoc.Alternative{1, 2},
 	}
-	status, _ = agent.Vote(voteReq)
+	status, _ = voteclientagent.Vote(voteReq)
 	if status != "200 OK" {
 		t.Error(status)
 	}
 
 	// A déjà voté
-	status, _ = agent.Vote(voteReq)
+	status, _ = voteclientagent.Vote(voteReq)
 	if status != "403 Forbidden" {
 		t.Error(status)
 	}
@@ -60,7 +60,7 @@ func TestVoteWrongParameter(t *testing.T) {
 		Prefs:    []comsoc.Alternative{1, 2},
 	}
 	// A déjà voté
-	status, _ = agent.Vote(voteReq)
+	status, _ = voteclientagent.Vote(voteReq)
 	if status != "400 Bad Request" {
 		t.Error(status)
 	}
@@ -71,7 +71,7 @@ func TestVoteWrongParameter(t *testing.T) {
 		Prefs:    []comsoc.Alternative{4, 2},
 	}
 	// Mauvais vote
-	status, _ = agent.Vote(voteReq)
+	status, _ = voteclientagent.Vote(voteReq)
 	if status != "400 Bad Request" {
 		t.Error(status)
 	}
@@ -83,7 +83,7 @@ func TestVoteWrongParameter(t *testing.T) {
 	}
 	time.Sleep(time.Second * 2)
 	// Deadline
-	status, _ = agent.Vote(voteReq)
+	status, _ = voteclientagent.Vote(voteReq)
 	if status != "503 Service Unavailable" {
 		t.Error(status)
 	}
@@ -99,7 +99,7 @@ func TestVoteApprovalWrongOptions(t *testing.T) {
 		NbAlts:       2,
 		TieBreakRule: []comsoc.Alternative{1, 2},
 	}
-	status, bID, _ := agent.Ballot(ballotReq)
+	status, bID, _ := voteclientagent.Ballot(ballotReq)
 	if bID.ID == "" || status != "201 Created" {
 		t.Error(status)
 	}
@@ -111,7 +111,7 @@ func TestVoteApprovalWrongOptions(t *testing.T) {
 		Prefs:    []comsoc.Alternative{1, 2},
 		Options:  []int{1},
 	}
-	status, _ = agent.Vote(voteReq)
+	status, _ = voteclientagent.Vote(voteReq)
 	if status != "200 OK" {
 		t.Error(status)
 	}
@@ -122,7 +122,7 @@ func TestVoteApprovalWrongOptions(t *testing.T) {
 		BallotId: bID.ID,
 		Prefs:    []comsoc.Alternative{1, 2},
 	}
-	status, _ = agent.Vote(voteReq)
+	status, _ = voteclientagent.Vote(voteReq)
 	if status != "400 Bad Request" {
 		t.Error(status)
 	}
@@ -134,7 +134,7 @@ func TestVoteApprovalWrongOptions(t *testing.T) {
 		Prefs:    []comsoc.Alternative{1, 2},
 		Options:  []int{77},
 	}
-	status, _ = agent.Vote(voteReq)
+	status, _ = voteclientagent.Vote(voteReq)
 	if status != "400 Bad Request" {
 		t.Error(status)
 	}

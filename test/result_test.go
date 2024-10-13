@@ -7,8 +7,8 @@ import (
 
 	td5 "github.com/StutenEXE/ai30-vote-server"
 
-	"github.com/StutenEXE/ai30-vote-server/agent"
 	"github.com/StutenEXE/ai30-vote-server/comsoc"
+	"github.com/StutenEXE/ai30-vote-server/voteclientagent"
 )
 
 func TestDeadlineNotPass(t *testing.T) {
@@ -20,7 +20,7 @@ func TestDeadlineNotPass(t *testing.T) {
 		NbAlts:       2,
 		TieBreakRule: []comsoc.Alternative{1, 2},
 	}
-	status, bID, _ := agent.Ballot(ballotReq)
+	status, bID, _ := voteclientagent.Ballot(ballotReq)
 	if bID.ID == "" || status != "201 Created" {
 		t.Error(status)
 	}
@@ -32,7 +32,7 @@ func TestDeadlineNotPass(t *testing.T) {
 		Prefs:    []comsoc.Alternative{1, 2},
 		Options:  []int{1},
 	}
-	status, _ = agent.Vote(voteReq)
+	status, _ = voteclientagent.Vote(voteReq)
 	if status != "200 OK" {
 		t.Error(status)
 	}
@@ -43,7 +43,7 @@ func TestDeadlineNotPass(t *testing.T) {
 		Prefs:    []comsoc.Alternative{2, 1},
 		Options:  []int{2},
 	}
-	status, _ = agent.Vote(voteReq)
+	status, _ = voteclientagent.Vote(voteReq)
 	if status != "200 OK" {
 		t.Error(status)
 	}
@@ -53,12 +53,12 @@ func TestDeadlineNotPass(t *testing.T) {
 	}
 
 	//On demande le résultat trop tot
-	status, result, _ := agent.Result(resultReq)
+	status, result, _ := voteclientagent.Result(resultReq)
 	if status != "425 Too Early" {
 		t.Error(status)
 	}
 	time.Sleep(time.Second * 2)
-	status, result, _ = agent.Result(resultReq)
+	status, result, _ = voteclientagent.Result(resultReq)
 
 	if status != "200 OK" || result.Winner != 1 {
 		t.Error(status)
@@ -76,7 +76,7 @@ func TestMajority(t *testing.T) {
 		NbAlts:       4,
 		TieBreakRule: listAlt,
 	}
-	status, bID, _ := agent.Ballot(ballotReq)
+	status, bID, _ := voteclientagent.Ballot(ballotReq)
 	if bID.ID == "" || status != "201 Created" {
 		t.Error(status)
 	}
@@ -96,7 +96,7 @@ func TestMajority(t *testing.T) {
 			BallotId: bID.ID,
 			Prefs:    prof,
 		}
-		status, _ = agent.Vote(voteReq)
+		status, _ = voteclientagent.Vote(voteReq)
 		if status != "200 OK" {
 			t.Error(status)
 		}
@@ -109,7 +109,7 @@ func TestMajority(t *testing.T) {
 		BallotId: bID.ID,
 	}
 
-	status, result, _ := agent.Result(resultReq)
+	status, result, _ := voteclientagent.Result(resultReq)
 	if status != "200 OK" {
 		t.Error(status)
 	}
@@ -133,7 +133,7 @@ func TestApproval(t *testing.T) {
 		NbAlts:       4,
 		TieBreakRule: listAlt,
 	}
-	status, bID, _ := agent.Ballot(ballotReq)
+	status, bID, _ := voteclientagent.Ballot(ballotReq)
 	if bID.ID == "" || status != "201 Created" {
 		t.Error(status)
 	}
@@ -155,7 +155,7 @@ func TestApproval(t *testing.T) {
 			Prefs:    prof,
 			Options:  []int{listThresholds[i]},
 		}
-		status, _ = agent.Vote(voteReq)
+		status, _ = voteclientagent.Vote(voteReq)
 		if status != "200 OK" {
 			t.Error(status)
 		}
@@ -168,7 +168,7 @@ func TestApproval(t *testing.T) {
 		BallotId: bID.ID,
 	}
 
-	status, result, _ := agent.Result(resultReq)
+	status, result, _ := voteclientagent.Result(resultReq)
 	if status != "200 OK" {
 		t.Error(status)
 	}
@@ -192,7 +192,7 @@ func TestBorda(t *testing.T) {
 		NbAlts:       4,
 		TieBreakRule: listAlt,
 	}
-	status, bID, _ := agent.Ballot(ballotReq)
+	status, bID, _ := voteclientagent.Ballot(ballotReq)
 	if bID.ID == "" || status != "201 Created" {
 		t.Error(status)
 	}
@@ -212,7 +212,7 @@ func TestBorda(t *testing.T) {
 			BallotId: bID.ID,
 			Prefs:    prof,
 		}
-		status, _ = agent.Vote(voteReq)
+		status, _ = voteclientagent.Vote(voteReq)
 		if status != "200 OK" {
 			t.Error(status)
 		}
@@ -225,7 +225,7 @@ func TestBorda(t *testing.T) {
 		BallotId: bID.ID,
 	}
 
-	status, result, _ := agent.Result(resultReq)
+	status, result, _ := voteclientagent.Result(resultReq)
 	if status != "200 OK" {
 		t.Error(status)
 	}
@@ -249,7 +249,7 @@ func TestCopeland(t *testing.T) {
 		NbAlts:       4,
 		TieBreakRule: listAlt,
 	}
-	status, bID, _ := agent.Ballot(ballotReq)
+	status, bID, _ := voteclientagent.Ballot(ballotReq)
 	if bID.ID == "" || status != "201 Created" {
 		t.Error(status)
 	}
@@ -269,7 +269,7 @@ func TestCopeland(t *testing.T) {
 			BallotId: bID.ID,
 			Prefs:    prof,
 		}
-		status, _ = agent.Vote(voteReq)
+		status, _ = voteclientagent.Vote(voteReq)
 		if status != "200 OK" {
 			t.Error(status)
 		}
@@ -282,7 +282,7 @@ func TestCopeland(t *testing.T) {
 		BallotId: bID.ID,
 	}
 
-	status, result, _ := agent.Result(resultReq)
+	status, result, _ := voteclientagent.Result(resultReq)
 	if status != "200 OK" {
 		t.Error(status)
 	}

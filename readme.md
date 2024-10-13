@@ -54,25 +54,25 @@ Le serveur devrait être lancé et écouter sur le **port 8080**
 
 ## Architecture 
 
-```md
+```
 td5/
-├─ ballot/        (généralisation des  votes au travers d'une interface)
+├─ ballot/       **(généralisation des  votes au travers d'une interface)**
 │  ├─ approvalballot.go
-│  ├─ ballot.go   (interface)
+│  ├─ ballot.go  **(interface)**
 │  ├─ bordaballot.go
 │  ├─ copelandballot.go
 │  ├─ majorityballot.go
-├─ cmd/           (codes de lancement de l'application)
+├─ cmd/          **(codes de lancement de l'application)**
 │  ├─ launch-server.go
-├─ comsoc/        (logiques de vote, provient du td4)
+├─ comsoc/       **(logiques de vote, provient du td4)**
 ├─ test/
 │  ├─ ballot_test.go
-│  ├─ result_test.go/
+│  ├─ result_test.go
 │  ├─ vote_test.go
 ├─ voteserveragent/
 │  ├─ server.go
 ├─ voteclientagent/
 │  ├─ client.go
-├─ types.go       (utilisés partout dans le code)
+├─ types.go      **(utilisés partout dans le code)**
 
 ```
