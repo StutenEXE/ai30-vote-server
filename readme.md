@@ -1,3 +1,7 @@
+# Serveur de Vote - TD5 AI30
+
+#### Bidaux Alexandre GI03 & Martins Clément GI03 
+
 ## Guide d'installation
 
 ```go install github.com/StutenEXE/ai30-vote-server/cmd@latest```
