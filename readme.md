@@ -32,3 +32,9 @@
 
 *    Création d'agents pour faciliter les requêtes
 *    Tests sur les scrutins, les votes et les résultats
+
+## Test
+* Test de création et d'erreur de création de (ballot, vote, et resultat)
+* Test sur les résultats d'un vote
+
+#### Voir dans `` /test ``
