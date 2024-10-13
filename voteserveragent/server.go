@@ -9,8 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"td5"
-	"td5/ballot"
+	td5 "github.com/StutenEXE/ai30-vote-server"
+
+	"github.com/StutenEXE/ai30-vote-server/ballot"
 )
 
 type RestVoteServerAgent struct {

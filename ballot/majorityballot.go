@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"td5/comsoc"
+	"github.com/StutenEXE/ai30-vote-server/comsoc"
 )
 
 type MajorityBallot struct {

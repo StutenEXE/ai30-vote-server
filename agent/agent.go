@@ -5,8 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"td5"
 	"time"
+
+	td5 "github.com/StutenEXE/ai30-vote-server"
 )
 
 var url string = "http://localhost:8080"

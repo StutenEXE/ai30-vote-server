@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"td5/voteserveragent"
+
+	"github.com/StutenEXE/ai30-vote-server/voteserveragent"
 )
 
 func main() {

@@ -2,11 +2,13 @@ package test
 
 import (
 	"reflect"
-	"td5"
-	"td5/agent"
-	"td5/comsoc"
 	"testing"
 	"time"
+
+	td5 "github.com/StutenEXE/ai30-vote-server"
+
+	"github.com/StutenEXE/ai30-vote-server/agent"
+	"github.com/StutenEXE/ai30-vote-server/comsoc"
 )
 
 func TestDeadlineNotPass(t *testing.T) {

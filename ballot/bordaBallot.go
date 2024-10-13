@@ -3,8 +3,9 @@ package ballot
 import (
 	"fmt"
 	"net/http"
-	"td5/comsoc"
 	"time"
+
+	"github.com/StutenEXE/ai30-vote-server/comsoc"
 )
 
 type BordaBallot struct {
