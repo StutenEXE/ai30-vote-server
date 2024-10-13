@@ -1,4 +1,4 @@
-package td5
+package tipe
 
 import (
 	"time"
