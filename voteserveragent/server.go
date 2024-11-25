@@ -75,7 +75,7 @@ func (rvsa *RestVoteServerAgent) addBallot(w http.ResponseWriter, r *http.Reques
 	id := fmt.Sprintf("scrutin%d", len(rvsa.ballots)+1)
 	if req.Deadline.IsZero() || req.VoterIds == nil || req.NbAlts == 0 || req.TieBreakRule == nil {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Erreur dans la requête, paramètre : rule Deadlin voter-ids #alts tie-break"))
+		w.Write([]byte("erreur dans la requête, paramètre : rule Deadlin voter-ids #alts tie-break"))
 		return
 	}
 
@@ -114,7 +114,7 @@ func (rvsa *RestVoteServerAgent) addBallot(w http.ResponseWriter, r *http.Reques
 		)
 	default:
 		w.WriteHeader(http.StatusNotImplemented)
-		msg := fmt.Sprintf("Unknown rule '%s'", req.Rule)
+		msg := fmt.Sprintf("règle inconnue '%s'", req.Rule)
 		w.Write([]byte(msg))
 		return
 	}
@@ -124,7 +124,7 @@ func (rvsa *RestVoteServerAgent) addBallot(w http.ResponseWriter, r *http.Reques
 	response := td5.BallotResponse{
 		ID: id,
 	}
-	byt, err := json.Marshal(response)
+	byt, _ := json.Marshal(response)
 	w.Write(byt)
 }
 
@@ -154,7 +154,7 @@ func (rvsa *RestVoteServerAgent) addVote(w http.ResponseWriter, r *http.Request)
 	bal := rvsa.getBallotById(req.BallotId)
 	if bal == nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(w, "Pas de ballot avec l'id %v", req.BallotId)
+		fmt.Fprintf(w, "pas de ballot avec l'id %v", req.BallotId)
 		return
 	}
 	// Deadline dépassée

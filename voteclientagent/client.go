@@ -5,15 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	td5 "github.com/StutenEXE/ai30-vote-server"
 )
 
 var url string = "http://localhost:8080"
 
-// J'ai mis un interface pour tes les types
-// de requete afin de faire tous les post possible
+// Interface pour les types de requete
+// afin de faire tous les post possible
 func makeRequest(endpoint string, method string, mesdata interface{}) (*http.Response, error) {
 	url := fmt.Sprintf("%s/%s", url, endpoint)
 
@@ -32,11 +31,7 @@ func makeRequest(endpoint string, method string, mesdata interface{}) (*http.Res
 	req.Header.Set("Content-Type", "application/json")
 
 	// Envoi de la requête
-	// JE sais pas trop trop quoi mettre en timeout
-	/// TODOO
-	client := &http.Client{
-		Timeout: 10 * time.Second,
-	}
+	client := &http.Client{}
 	res, err := client.Do(req)
 	return res, err
 }

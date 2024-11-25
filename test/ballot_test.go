@@ -21,7 +21,7 @@ func TestWrongBallotParameters(t *testing.T) {
 		TieBreakRule: []comsoc.Alternative{},
 	}
 
-	// 1 Rule inconnu
+	// Règle inconnue
 	status, ballotID, _ := voteclientagent.Ballot(ballotReq)
 	if ballotID.ID != "" || status != "501 Not Implemented" {
 		t.Error(status)
