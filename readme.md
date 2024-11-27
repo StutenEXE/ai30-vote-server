@@ -62,7 +62,7 @@ td5/
 │  ├─ majorityballot.go
 ├─ cmd/          **(codes de lancement de l'application)**
 │  ├─ launch-server.go
-├─ comsoc/       **(logiques de vote, provient du td4)**
+├─ comsoc/       **(logiques de vote, provient du td3)**
 ├─ test/
 │  ├─ ballot_test.go
 │  ├─ result_test.go
